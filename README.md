@@ -37,9 +37,9 @@
 克隆仓库（将下面的用户名替换为你的GitHub用户名）：
     ```bash
     git clone https://github.com/你的GitHub用户名/smart-customer-service.git
-    cd smart-customer-service/backend
-安装所有依赖包：
-pip install -r requirements.txt
+     ```cd smart-customer-service/backend
+ ```安装所有依赖包：
+    pip install -r requirements.txt
 # 通义千问API密钥（必填）
 DASHSCOPE_API_KEY=你的通义千问API密钥
 
@@ -67,46 +67,46 @@ python main.py
     点击右上角的 "编译" 按钮，小程序就会在模拟器中运行
 
 项目结构
-smart-customer-service/
-├── backend/                     # 后端服务根目录
-│   ├── data/                    # 数据目录（首次运行自动生成）
-│   │   ├── chat.db              # SQLite数据库，存储所有用户聊天历史
-│   │   ├── faiss_index.bin      # FAISS向量索引文件，自动生成
-│   │   └── knowledge_base.txt   # 知识库文件，你需要编辑这个添加业务知识
-│   ├── services/                # 核心业务服务模块
-│   │   ├── llm_service.py       # 通义千问大模型调用服务
-│   │   └── vector_service.py    # FAISS向量检索与索引构建服务
-│   ├── .env                     # 环境变量配置文件（包含API密钥，不上传GitHub）
-│   ├── main.py                  # FastAPI主程序，后端服务入口
-│   └── requirements.txt         # Python依赖包列表
-└── frontend/                    # 前端小程序根目录
-    └── 智能客服小程序/
-        ├── pages/               # 小程序页面目录
-        │   └── index/           # 唯一页面：聊天主界面
-        │       ├── index.js     # 页面逻辑与网络请求
-        │       ├── index.wxml   # 页面结构与组件
-        │       ├── index.wxss   # 页面样式
-        │       └── index.json   # 页面局部配置
-        ├── app.js               # 小程序全局入口文件
-        ├── app.json             # 小程序全局配置（页面路由、窗口样式等）
-        ├── app.wxss             # 小程序全局样式
-        ├── project.config.json  # 项目公共配置（团队共享，上传GitHub）
-        └── project.private.config.json  # 本地私有配置（个人设置，不上传）
+ ```smart-customer-service/
+ ```├── backend/                     # 后端服务根目录
+    │   ├── data/                    # 数据目录（首次运行自动生成）
+    │   │   ├── chat.db              # SQLite数据库，存储所有用户聊天历史
+    │   │   ├── faiss_index.bin      # FAISS向量索引文件，自动生成
+    │   │   └── knowledge_base.txt   # 知识库文件，你需要编辑这个添加业务知识
+    │   ├── services/                # 核心业务服务模块
+    │   │   ├── llm_service.py       # 通义千问大模型调用服务
+    │   │   └── vector_service.py    # FAISS向量检索与索引构建服务
+    │   ├── .env                     # 环境变量配置文件（包含API密钥，不上传GitHub）
+    │   ├── main.py                  # FastAPI主程序，后端服务入口
+    │   └── requirements.txt         # Python依赖包列表
+    └── frontend/                    # 前端小程序根目录
+        └── 智能客服小程序/
+            ├── pages/               # 小程序页面目录
+            │   └── index/           # 唯一页面：聊天主界面
+            │       ├── index.js     # 页面逻辑与网络请求
+            │       ├── index.wxml   # 页面结构与组件
+            │       ├── index.wxss   # 页面样式
+            │       └── index.json   # 页面局部配置
+            ├── app.js               # 小程序全局入口文件
+            ├── app.json             # 小程序全局配置（页面路由、窗口样式等）
+            ├── app.wxss             # 小程序全局样式
+            ├── project.config.json  # 项目公共配置（团队共享，上传GitHub）
+            └── project.private.config.json  # 本地私有配置（个人设置，不上传）
 
-API 接口说明
-所有接口都可以在 http://localhost:8000/docs 中查看详细文档并进行测试。
+ ```API 接口说明：
+    所有接口都可以在 http://localhost:8000/docs 中查看详细文档并进行测试。
 
-接口地址	请求方法	说明
-/api/chat	POST	发送消息，获取智能回答
-/api/faq	GET	获取常见问题列表
-/api/history/{user_id}	GET	获取指定用户的聊天历史
+ ```接口地址	请求方法	说明
+    /api/chat	POST	发送消息，获取智能回答
+    /api/faq	GET	获取常见问题列表
+    /api/history/{user_id}	GET	获取指定用户的聊天历史
 
-后续扩展方向：
-    支持多轮对话上下文理解
-    添加用户评价和满意度调查功能
-    实现完整的客服工单系统
-    添加后台管理面板和数据分析功能
-    支持图片和语音输入
-    集成更多大模型（GPT-4o、Claude 3 等）
-    部署到云服务器实现公网访问
-    支持多客服同时在线
+ ```后续扩展方向：
+        支持多轮对话上下文理解
+        添加用户评价和满意度调查功能
+        实现完整的客服工单系统
+        添加后台管理面板和数据分析功能
+        支持图片和语音输入
+        集成更多大模型（GPT-4o、Claude 3 等）
+        部署到云服务器实现公网访问
+        支持多客服同时在线
