@@ -34,18 +34,3 @@
     ```bash
     git clone https://github.com/你的用户名/smart-customer-service.git
     cd smart-customer-service/backend
-2. 安装依赖：
-    ```bash
-    pip install -r requirements.txt
-3. 配置环境变量：
-    在 backend 目录下创建 .env 文件，填写你的通义千问 API 密钥：
-    DASHSCOPE_API_KEY=你的通义千问API密钥
-    LLM_MODEL=qwen-turbo
-4. 启动服务：
-    python main.py
-
-        │       ├── index.wxml
-        │       └── index.wxss
-        ├── app.js               # 小程序入口
-        ├── app.json             # 全局配置
-        └── app.wxss             # 全局样式
