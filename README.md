@@ -53,7 +53,8 @@ PORT=8000
 
 启动后端服务：
 python main.py
-验证服务是否正常运行：打开浏览器访问 http://localhost:8000/docs，你会看到 FastAPI 自动生成的 API 文档界面。
+验证服务是否正常运行：打开浏览器访问 http://localhost:8000/docs
+你会看到 FastAPI 自动生成的 API 文档界面。
 
 小程序部署
     打开微信开发者工具
@@ -68,31 +69,33 @@ python main.py
 项目结构
 smart-customer-service/
 ├── backend/                     # 后端服务根目录
-│   ├── data/                    # 数据目录（自动生成）
-│   │   ├── chat.db              # SQLite数据库，存储聊天历史
-│   │   ├── faiss_index.bin      # FAISS向量索引文件
-│   │   └── knowledge_base.txt   # 知识库文件，你需要编辑这个
-│   ├── services/                # 核心服务模块
-│   │   ├── llm_service.py       # 大模型调用服务
-│   │   └── vector_service.py    # 向量检索服务
-│   ├── .env                     # 环境变量配置
-│   ├── main.py                  # FastAPI主程序，入口文件
+│   ├── data/                    # 数据目录（首次运行自动生成）
+│   │   ├── chat.db              # SQLite数据库，存储所有用户聊天历史
+│   │   ├── faiss_index.bin      # FAISS向量索引文件，自动生成
+│   │   └── knowledge_base.txt   # 知识库文件，你需要编辑这个添加业务知识
+│   ├── services/                # 核心业务服务模块
+│   │   ├── llm_service.py       # 通义千问大模型调用服务
+│   │   └── vector_service.py    # FAISS向量检索与索引构建服务
+│   ├── .env                     # 环境变量配置文件（包含API密钥，不上传GitHub）
+│   ├── main.py                  # FastAPI主程序，后端服务入口
 │   └── requirements.txt         # Python依赖包列表
 └── frontend/                    # 前端小程序根目录
     └── 智能客服小程序/
-        ├── pages/               # 页面目录
-        │   └── index/           # 首页（聊天页面）
-        │       ├── index.js     # 页面逻辑
-        │       ├── index.wxml   # 页面结构
+        ├── pages/               # 小程序页面目录
+        │   └── index/           # 唯一页面：聊天主界面
+        │       ├── index.js     # 页面逻辑与网络请求
+        │       ├── index.wxml   # 页面结构与组件
         │       ├── index.wxss   # 页面样式
-        │       └── index.json   # 页面配置
-        ├── app.js               # 小程序全局入口
-        ├── app.json             # 小程序全局配置
+        │       └── index.json   # 页面局部配置
+        ├── app.js               # 小程序全局入口文件
+        ├── app.json             # 小程序全局配置（页面路由、窗口样式等）
         ├── app.wxss             # 小程序全局样式
-        ├── project.config.json  # 项目公共配置
-        └── project.private.config.json  # 本地私有配置
+        ├── project.config.json  # 项目公共配置（团队共享，上传GitHub）
+        └── project.private.config.json  # 本地私有配置（个人设置，不上传）
+
 API 接口说明
 所有接口都可以在 http://localhost:8000/docs 中查看详细文档并进行测试。
+
 接口地址	请求方法	说明
 /api/chat	POST	发送消息，获取智能回答
 /api/faq	GET	获取常见问题列表
