@@ -43,25 +43,7 @@
     LLM_MODEL=qwen-turbo
 4. 启动服务：
     python main.py
-5. 访问 API 文档：http://localhost:8000/docs
 
-
-项目结构
-plaintext
-
-├── backend/                     # 后端服务
-│   ├── data/                    # 数据目录（自动生成）
-│   ├── services/                # 服务模块
-│   │   ├── llm_service.py       # 大模型服务
-│   │   └── vector_service.py    # 向量检索服务
-│   ├── .env                     # 环境变量配置（不上传）
-│   ├── main.py                  # FastAPI主程序
-│   └── requirements.txt         # 依赖包列表
-└── frontend/                    # 前端小程序
-    └── 智能客服小程序/
-        ├── pages/               # 页面文件
-        │   └── index/
-        │       ├── index.js
         │       ├── index.wxml
         │       └── index.wxss
         ├── app.js               # 小程序入口
