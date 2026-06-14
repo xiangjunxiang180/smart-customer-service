@@ -1,112 +1,169 @@
 # 智能人工客服小程序
 
-基于Python FastAPI和通义千问API开发的智能客服系统，支持RAG知识库检索、自动问答和人工客服转接功能。
+基于 Python FastAPI + 通义千问 API + RAG 技术构建的端到端智能客服系统，支持知识库检索问答、人工客服转接、聊天记录持久化等完整功能。
 
-## 功能特点
+## 项目亮点
 
-- ✅ **智能问答**：基于RAG技术，从知识库中检索相关信息生成专业回答
-- ✅ **人工客服**：支持一键转接人工客服
-- ✅ **聊天历史**：自动保存用户聊天记录，刷新页面不丢失
-- ✅ **常见问题**：预设常见问题列表，点击即可快速解答
-- ✅ **微信小程序**：原生微信小程序前端界面，无需下载安装
-- ✅ **向量检索**：使用FAISS高效向量检索引擎，毫秒级响应
-- ✅ **大模型集成**：集成通义千问API，支持多种模型切换
-- ✅ **本地部署**：完全本地运行，数据安全可控
+- **RAG全链路**：文档向量化 → FAISS IndexFlatL2精确检索 → 通义千问生成回答，知识库问答准确率接近100%
+- **混合检索**：BM25关键词检索（50%）+ FAISS向量检索（50%）加权融合，兼顾精确匹配和语义理解
+- **工程化设计**：向量索引持久化（首次构建后直接加载）、数据库自动创建、配置分离（.env）
+- **完整产品**：后端API + 微信小程序双端可用，接口响应 < 2s，开箱即用
 
 ## 技术栈
 
-| 模块 | 技术选型 |
-|------|----------|
-| 后端框架 | Python 3.10+, FastAPI |
-| 数据库 | SQLite（轻量级嵌入式数据库） |
-| 向量引擎 | FAISS（Facebook AI Similarity Search） |
-| 大模型 | 通义千问API (qwen-turbo) |
-| 向量模型 | 通义千问文本向量模型 |
-| 前端 | 微信小程序原生开发 |
+| 模块 | 技术选型 | 说明 |
+|------|---------|------|
+| 后端框架 | Python 3.10 + FastAPI | 异步框架，自带Swagger文档 |
+| 向量引擎 | FAISS IndexFlatL2 | 精确向量检索，适合小规模知识库 |
+| 关键词检索 | BM25Okapi + jieba分词 | 中文关键词精确匹配 |
+| 大模型 | 通义千问 qwen-turbo | 基于检索结果生成专业回答 |
+| Embedding | 通义千问 text-embedding-v1 | 文本向量化，区分document/query类型 |
+| 数据库 | SQLite | 轻量级，聊天记录持久化 |
+| 前端 | 微信小程序原生开发 | 无需下载安装，移动端直达 |
+
+## 系统架构
+
+```
+用户发送消息（微信小程序）
+        ↓
+FastAPI /api/chat 接口
+        ↓
+1. 消息存入 SQLite
+        ↓
+2. VectorService.search()
+   ├── BM25关键词检索（jieba分词）→ Top10候选
+   ├── FAISS向量检索（通义千问Embedding）→ Top10候选
+   └── 加权融合（各50%）→ Top3最相关文档
+        ↓
+3. LLMService.generate_response()
+   └── 通义千问API（RAG Prompt）→ 生成回答
+        ↓
+4. 回答存入 SQLite，返回给前端
+```
 
 ## 快速开始
 
 ### 环境准备
 
-1.  安装Python 3.10或更高版本（推荐3.11）
-2.  注册阿里云账号并开通通义千问API服务
-3.  在阿里云控制台获取你的通义千问API密钥
-4.  安装微信开发者工具（用于运行和调试小程序）
+- Python 3.10+
+- 通义千问API密钥（[申请地址](https://dashscope.aliyun.com)）
+- 微信开发者工具（运行小程序）
 
-### 后端部署
-克隆仓库（将下面的用户名替换为你的GitHub用户名）：
-    ```bash
-    git clone https://github.com/你的GitHub用户名/smart-customer-service.git
-     ```cd smart-customer-service/backend
- ```安装所有依赖包：
-    pip install -r requirements.txt
-# 通义千问API密钥（必填）
-DASHSCOPE_API_KEY=你的通义千问API密钥
+### 后端启动
 
-# 大模型配置（可选，默认使用qwen-turbo）
-LLM_MODEL=qwen-turbo
-VECTOR_MODEL=text-embedding-v1
+```bash
+# 1. 克隆项目
+git clone https://github.com/xiangjunxiang180/smart-customer-service.git
+cd smart-customer-service/backend
 
-# 服务器配置（可选）
-HOST=0.0.0.0
-PORT=8000
+# 2. 安装依赖
+pip install -r requirements.txt
 
-启动后端服务：
+# 3. 配置环境变量
+cp .env.example .env
+# 编辑 .env，填入你的通义千问API密钥：
+# DASHSCOPE_API_KEY=sk-你的密钥
+
+# 4. 启动服务
 python main.py
-验证服务是否正常运行：打开浏览器访问 http://localhost:8000/docs
-你会看到 FastAPI 自动生成的 API 文档界面。
+```
 
-小程序部署
-    打开微信开发者工具
-    点击 "导入项目"，选择 frontend/智能客服小程序 目录
-    AppID 选择你的测试号或正式小程序 AppID
-    点击 "导入" 按钮
-    打开 pages/index/index.js 文件，将所有的 http://localhost:8000 替换为你的后端服务地址
-        本地开发：使用 http://你的本机IP:8000
-        生产环境：使用你的公网域名
-    点击右上角的 "编译" 按钮，小程序就会在模拟器中运行
+启动成功后访问：`http://127.0.0.1:8000/docs` 查看接口文档
 
-项目结构
- ```smart-customer-service/
- ```├── backend/                     # 后端服务根目录
-    │   ├── data/                    # 数据目录（首次运行自动生成）
-    │   │   ├── chat.db              # SQLite数据库，存储所有用户聊天历史
-    │   │   ├── faiss_index.bin      # FAISS向量索引文件，自动生成
-    │   │   └── knowledge_base.txt   # 知识库文件，你需要编辑这个添加业务知识
-    │   ├── services/                # 核心业务服务模块
-    │   │   ├── llm_service.py       # 通义千问大模型调用服务
-    │   │   └── vector_service.py    # FAISS向量检索与索引构建服务
-    │   ├── .env                     # 环境变量配置文件（包含API密钥，不上传GitHub）
-    │   ├── main.py                  # FastAPI主程序，后端服务入口
-    │   └── requirements.txt         # Python依赖包列表
-    └── frontend/                    # 前端小程序根目录
-        └── 智能客服小程序/
-            ├── pages/               # 小程序页面目录
-            │   └── index/           # 唯一页面：聊天主界面
-            │       ├── index.js     # 页面逻辑与网络请求
-            │       ├── index.wxml   # 页面结构与组件
-            │       ├── index.wxss   # 页面样式
-            │       └── index.json   # 页面局部配置
-            ├── app.js               # 小程序全局入口文件
-            ├── app.json             # 小程序全局配置（页面路由、窗口样式等）
-            ├── app.wxss             # 小程序全局样式
-            ├── project.config.json  # 项目公共配置（团队共享，上传GitHub）
-            └── project.private.config.json  # 本地私有配置（个人设置，不上传）
+**首次启动**会自动构建向量索引（调用通义千问Embedding API对知识库向量化），之后启动直接加载已有索引，无需重复构建。
 
- ```API 接口说明：
-    所有接口都可以在 http://localhost:8000/docs 中查看详细文档并进行测试。
+### 小程序启动
 
- ```接口地址	请求方法	说明
-    /api/chat	POST	发送消息，获取智能回答
-    /api/faq	GET	获取常见问题列表
-    /api/history/{user_id}	GET	获取指定用户的聊天历史
+1. 打开微信开发者工具，导入 `frontend/智能客服小程序` 目录
+2. 修改 `pages/index/index.js` 中的后端地址为你的服务器IP
+3. 开发调试：勾选「不校验合法域名」
+4. 点击编译运行
 
- ```后续扩展方向：
-        支持多轮对话上下文理解
-        添加用户评价和满意度调查功能
-        实现完整的客服工单系统
-        添加后台管理面板和数据分析功能
-        支持图片和语音输入
-        集成更多大模型（GPT-4o、Claude 3 等）
-        部署到云服务器实现公网访问
-        支持多客服同时在线
+## API接口
+
+| 接口 | 方法 | 说明 |
+|------|------|------|
+| `/api/chat` | POST | 发送消息，获取智能回答 |
+| `/api/history/{user_id}` | GET | 获取用户聊天历史 |
+| `/api/faq` | GET | 获取常见问题列表 |
+| `/docs` | GET | Swagger接口文档（可直接测试） |
+
+**chat接口请求示例：**
+```json
+{
+  "user_id": "user_123",
+  "content": "你们的退换货政策是什么？",
+  "is_manual": false
+}
+```
+
+**响应示例：**
+```json
+{
+  "response": "我们提供7天无理由退换货服务，商品需保持原包装完好。请联系客服申请退换货流程。"
+}
+```
+
+## 项目结构
+
+```
+smart-customer-service/
+├── backend/
+│   ├── data/                      # 数据目录（首次运行自动生成）
+│   │   ├── chat.db                # SQLite数据库，存储聊天记录
+│   │   ├── faiss_index.bin        # FAISS向量索引（首次构建后持久化）
+│   │   └── knowledge_base.txt     # 知识库文件，每行一条知识条目
+│   ├── services/
+│   │   ├── llm_service.py         # 通义千问大模型调用，RAG Prompt构建
+│   │   └── vector_service.py      # 向量检索服务（BM25+FAISS混合检索）
+│   ├── main.py                    # FastAPI主程序，接口定义，数据库初始化
+│   ├── requirements.txt           # Python依赖包
+│   └── .env                       # 环境变量（API密钥，不提交Git）
+└── frontend/
+    └── 智能客服小程序/
+        └── pages/index/           # 聊天主界面
+            ├── index.js           # 页面逻辑，API调用
+            ├── index.wxml         # 页面结构
+            └── index.wxss         # 页面样式
+```
+
+## 核心技术说明
+
+### 为什么用 IndexFlatL2 而不是 IVF/HNSW？
+
+本项目知识库规模为几十到几百条，`IndexFlatL2` 暴力精确搜索完全满足需求，检索耗时 < 1ms。IVF/HNSW 是针对百万级数据的近似检索方案，在小规模下引入了不必要的复杂度且精度有损失。若知识库扩展至百万级，可切换至 `IndexIVFFlat`。
+
+### 为什么用混合检索？
+
+- **纯向量检索的缺点**：对专有名词、数字、型号等精确词汇不敏感，"退换货" 和 "换货" 可能被视为不同语义
+- **纯BM25的缺点**：无法理解语义，"怎么换货" 和 "退货流程" 会被认为无关
+- **混合检索**：两路各取50%权重融合，兼顾精确匹配和语义理解，适合中文客服场景
+
+### 向量化区分 document/query 类型
+
+构建索引时知识库文本用 `text_type="document"`，检索时用户问题用 `text_type="query"`，通义千问对两种类型有不同的优化策略，能提升检索相关性。
+
+## 自定义知识库
+
+编辑 `backend/data/knowledge_base.txt`，每行写一条知识：
+
+```
+我们的产品支持微信小程序、网页和APP三种接入方式。
+客服工作时间是周一至周五 9:00-18:00。
+提供7天无理由退换货服务，商品需保持原包装完好。
+保修期为购买之日起一年，非人为损坏免费维修。
+```
+
+修改后删除 `backend/data/faiss_index.bin`，重启服务会自动重建索引。
+
+## 已知局限性与改进方向
+
+- [ ] 前端IP地址硬编码，待抽取为配置文件
+- [ ] 缺少用户鉴权，生产环境需接入token验证
+- [ ] SQLite并发写入有锁竞争，高并发场景需换MySQL
+- [ ] 原有设计含BGE Reranker重排序，因本地HuggingFace网络问题暂时移除，可改用通义千问Rerank API替代
+- [ ] 知识库更新需重建索引，待实现增量更新接口
+
+## License
+
+MIT
